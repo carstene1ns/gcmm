@@ -16,5 +16,7 @@ int CardWriteFile (int slot);
 void MC_DeleteMode(int slot);
 void MC_FormatMode(s32 slot);
 void WaitCardError(char *src, int error);
-static int OFFSET = 0;
+
+
+extern char currFolder[260];
 #endif

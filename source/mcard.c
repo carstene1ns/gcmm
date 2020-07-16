@@ -22,6 +22,8 @@
 #include "gci.h"
 #include "freetype.h"
 
+int OFFSET = 0;
+
 /*** Memory Card Work Area ***/
 static u8 SysArea[CARD_WORKAREA] ATTRIBUTE_ALIGN (32);
 
@@ -48,7 +50,7 @@ int lasticon;
 /*** This matrix will serve as our array of filenames for each file on the card
      We add 10 to filenamelen since we add on game company info***/
 u8 filelist[1024][1024];
-u8 currFolder[260];
+char currFolder[260];
 int folderCount;
 int displaypath;
 int maxfile;
@@ -329,7 +331,6 @@ int CardReadFileHeader (int slot, int id)
 	char gamecode[6];
 	int filesize;
 	int i;
-	u16 check_fmt, check_speed;
 
 	if (id >= cardcount)
 	{
@@ -606,7 +607,6 @@ int CardWriteFile (int slot)
 	int err, ret;
 	u32 SectorSize;
 	int offset;
-	int written;
 	int filelen;
 	char txt[128];
 
@@ -714,11 +714,11 @@ tryagain:
 	{
 		if ((offset + SectorSize) <= filelen)
 		{
-			written = CARD_Write (&CardFile, FileBuffer + MCDATAOFFSET + offset + OFFSET, SectorSize, offset);
+			CARD_Write (&CardFile, FileBuffer + MCDATAOFFSET + offset + OFFSET, SectorSize, offset);
 		}
 		else
 		{
-			written = CARD_Write (&CardFile, FileBuffer + MCDATAOFFSET + offset + OFFSET, ((offset + SectorSize) - filelen), offset);
+			CARD_Write (&CardFile, FileBuffer + MCDATAOFFSET + offset + OFFSET, ((offset + SectorSize) - filelen), offset);
 		}
 
 		offset += SectorSize;
@@ -863,8 +863,8 @@ void MC_DeleteMode(int slot)
 				}
 
 				/*** Initialise for this company & gamecode ***/
-				CARD_SetCompany(CardList[selected].company);
-				CARD_SetGamecode(CardList[selected].gamecode);
+				CARD_SetCompany((char *)CardList[selected].company);
+				CARD_SetGamecode((char *)CardList[selected].gamecode);
 
 				err = CARD_Delete(slot, (char *) &CardList[selected].filename);
 				if (err < 0)
@@ -959,7 +959,7 @@ s32 FZEROGX_MakeSaveGameValid(s32 chn)
 	u32 serial1,serial2;
 	u16 chksum = 0xFFFF;
 
-	if(strcasecmp(&FileBuffer[0x08],"f_zero.dat")!=0) return CARD_ERROR_READY;		// check for F-Zero GX system file
+	if(strcasecmp((char *)&FileBuffer[0x08],"f_zero.dat")!=0) return CARD_ERROR_READY;		// check for F-Zero GX system file
 	if((ret=CARD_GetSerialNo(chn,&serial1,&serial2))<0) return ret;			// get encrypted destination memory card serial numbers
 
 	*(u16*)&FileBuffer[0x2066+MCDATAOFFSET] = serial1 >> 16;			// set new serial numbers
@@ -998,12 +998,12 @@ s32 PSO_MakeSaveGameValid(s32 chn)
 	u32 serial1,serial2;
 	u32 pso3offset;
 
-	if(strcasecmp(&FileBuffer[0x08],"PSO_SYSTEM")==0) {				// check for PSO1&2 system file
+	if(strcasecmp((char *)&FileBuffer[0x08],"PSO_SYSTEM")==0) {				// check for PSO1&2 system file
 		pso3offset = 0x00;
 		goto exit;
 	}
 
-	if(strcasecmp(&FileBuffer[0x08],"PSO3_SYSTEM")==0) {				// check for PSO3 system file
+	if(strcasecmp((char *)&FileBuffer[0x08],"PSO3_SYSTEM")==0) {				// check for PSO3 system file
 		pso3offset = 0x10;							// PSO3 data block size adjustment
 		goto exit;
 	}

@@ -47,7 +47,6 @@ extern u32 maxfile;
 extern GCI gci;
 extern int OFFSET;
 
-extern u8 currFolder[260];
 extern int folderCount;
 
 bool file_exists(const char * filename)
@@ -121,7 +120,9 @@ int SDSaveMCImage ()
 			if (handle <= 0)
 			{
 				char msg[100];
-				sprintf(msg, "Couldn't open %s", filename);
+				int ret = snprintf(msg, 100, "Couldn't open %s", filename);
+				if (ret > 100) strcpy(&msg[96], "...");
+
 				WaitPrompt (msg);
 				return 0;
 			}
@@ -192,7 +193,8 @@ int SDLoadMCImage(char *sdfilename)
 	handle = fopen ( filename , "rb" );
 	if (handle <= 0)
 	{
-		sprintf(msg, "Couldn't open %s", filename);
+		int ret = snprintf(msg, 256, "Couldn't open %s", filename);
+		if (ret > 256) strcpy(&msg[252], "...");
 		WaitPrompt (msg);
 		return 0;
 	}
@@ -275,7 +277,8 @@ int SDLoadMCImageHeader(char *sdfilename)
 	handle = fopen ( filename , "rb" );
 	if (handle <= 0)
 	{
-		sprintf(msg, "Couldn't open %s", filename);
+		int ret = snprintf(msg, 256, "Couldn't open %s", filename);
+		if (ret > 256) strcpy(&msg[252], "...");
 		WaitPrompt (msg);
 		return 0;
 	}
@@ -519,7 +522,8 @@ int SDLoadCardImageHeader(char *sdfilename)
 	handle = fopen ( filename , "rb" );
 	if (handle <= 0)
 	{
-		sprintf(msg, "Couldn't open %s", filename);
+		int ret = snprintf(msg, 256, "Couldn't open %s", filename);
+		if (ret > 256) strcpy(&msg[252], "...");
 		WaitPrompt (msg);
 		return 0;
 	}
@@ -609,8 +613,7 @@ int SDGetFileList(int mode)
 	int filecount = 0;
 	DIR *dir;
 	struct dirent *dit;
-	static char namefile[256*4]; // enough room for UTF-8 encoding
-	int dirtype;
+	static char namefile[1024*2]; // enough room for UTF-8 encoding
 	//static struct stat filestat;
 
 	int dirCount = 0;
@@ -659,7 +662,6 @@ int SDGetFileList(int mode)
 				{
 					strcpy((char *)filelist[filecount], dit->d_name);
 					sprintf(namefile, "%s%s", filename, dit->d_name);
-					dirtype = ((isdir_sd(namefile) == 1) ? DIRENT_T_DIR : DIRENT_T_FILE);
 
 					filecount++;
 				}
@@ -670,7 +672,6 @@ int SDGetFileList(int mode)
 				{
 					strcpy((char *)filelist[filecount], dit->d_name);
 					sprintf(namefile, "%s%s", filename, dit->d_name);
-					dirtype = ((isdir_sd(namefile) == 1) ? DIRENT_T_DIR : DIRENT_T_FILE);
 
 					filecount++;
 				}
@@ -691,9 +692,9 @@ int SDGetFileList(int mode)
 		 {
             char temp[1024];
 			
-			sprintf(temp, "%s", (char*)filelist[i]);
-			sprintf((char*)filelist[i], "%s", (char*)filelist[j]);
-			sprintf((char*)filelist[j], "%s", temp);
+			strncpy(temp, (char*)filelist[i], 1023);
+			strncpy((char*)filelist[i], (char*)filelist[j], 1024);
+			strncpy((char*)filelist[j], temp, 1024);
          }
     }
 	
@@ -707,9 +708,9 @@ int SDGetFileList(int mode)
 		 {
             char temp[1024];
 			
-			sprintf(temp, "%s", (char*)filelist[i]);
-			sprintf((char*)filelist[i], "%s", (char*)filelist[j]);
-			sprintf((char*)filelist[j], "%s", temp);
+			strncpy(temp, (char*)filelist[i], 1023);
+			strncpy((char*)filelist[i], (char*)filelist[j], 1024);
+			strncpy((char*)filelist[j], temp, 1024);
          }
     }
 

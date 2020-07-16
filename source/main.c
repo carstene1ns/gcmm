@@ -53,7 +53,6 @@ u32 retraceCount;
 
 extern u8 filelist[1024][1024];
 extern bool offsetchanged;
-extern u8 currFolder[260];
 extern int folderCount;
 extern int displaypath;
 
@@ -486,7 +485,7 @@ void SD_RestoreMode ()
 	
 	//Dragonbane: Curr Folder to default
 	
-	sprintf((char*)currFolder, "MCBACKUP");
+	sprintf(currFolder, "MCBACKUP");
 
 	files = SDGetFileList (1);
 
@@ -512,7 +511,7 @@ void SD_RestoreMode ()
 
 			if (cancel)
 			{
-				if (strcmp((char*)currFolder, "MCBACKUP") == 0)
+				if (strcmp(currFolder, "MCBACKUP") == 0)
 				{
 					WaitPrompt ("Restore action cancelled !");
 					return;
@@ -520,9 +519,9 @@ void SD_RestoreMode ()
 				else
 				{
 					//Go back one folder			
-					char* pos = strrchr( (char*)currFolder, '/' );
+					char* pos = strrchr(currFolder, '/' );
 
-					currFolder[(pos-(char*)currFolder)] = 0; 
+					currFolder[(pos-currFolder)] = 0; 
 
 					files = SDGetFileList (1);
 					
@@ -583,7 +582,7 @@ void SD_RestoreMode ()
 				if(isdir_sd(folder) == 1)
 				{
 					//Enter folder
-					sprintf((char*)currFolder, "%s/%s", currFolder, (char*)filelist[selected]);
+					sprintf(currFolder+strlen(currFolder), "/%s", (char*)filelist[selected]);
 
 					files = SDGetFileList (1);
 					if (!files)
@@ -591,9 +590,9 @@ void SD_RestoreMode ()
 						WaitPrompt("Folder is empty!");
 						
 						//Go back again			
-						char* pos = strrchr( (char*)currFolder, '/' );
+						char* pos = strrchr(currFolder, '/' );
 
-						currFolder[(pos-(char*)currFolder)] = 0; 
+						currFolder[(pos-currFolder)] = 0; 
 
 						files = SDGetFileList (1);
 					}
@@ -688,7 +687,7 @@ void SD_RawRestoreMode ()
 	writeStatusBar("Reading files... ", "");
 	
 	//Curr Folder to default
-	sprintf((char*)currFolder, "MCBACKUP");
+	sprintf(currFolder, "MCBACKUP");
 	
 	files = SDGetFileList (0);
 
@@ -710,7 +709,7 @@ void SD_RawRestoreMode ()
 
 			if (cancel)
 			{
-				if (strcmp((char*)currFolder, "MCBACKUP") == 0)
+				if (strcmp(currFolder, "MCBACKUP") == 0)
 				{
 					WaitPrompt ("Restore action cancelled !");
 					return;
@@ -718,9 +717,9 @@ void SD_RawRestoreMode ()
 				else
 				{
 					//Go back one folder			
-					char* pos = strrchr( (char*)currFolder, '/' );
+					char* pos = strrchr(currFolder, '/' );
 
-					currFolder[(pos-(char*)currFolder)] = 0; 
+					currFolder[(pos-currFolder)] = 0; 
 
 					files = SDGetFileList (0);
 					
@@ -739,7 +738,7 @@ void SD_RawRestoreMode ()
 				if(isdir_sd(folder) == 1)
 				{
 					//Enter folder
-					sprintf((char*)currFolder, "%s/%s", currFolder, (char*)filelist[selected]);
+					sprintf(currFolder+strlen(currFolder), "/%s", (char*)filelist[selected]);
 
 					files = SDGetFileList (0);
 					if (!files)
@@ -747,9 +746,9 @@ void SD_RawRestoreMode ()
 						WaitPrompt("Folder is empty!");
 						
 						//Go back again			
-						char* pos = strrchr( (char*)currFolder, '/' );
+						char* pos = strrchr(currFolder, '/' );
 
-						currFolder[(pos-(char*)currFolder)] = 0; 
+						currFolder[(pos-currFolder)] = 0; 
 
 						files = SDGetFileList (0);
 					}

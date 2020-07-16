@@ -2,14 +2,15 @@
 * libFreeType
 *
 * Needed to show the user what's the hell's going on !!
-* These functions are generic, and do not contain any Memory Card specific
-* routines.
+* FIXME: These functions should be generic, and do not contain any
+*        Memory Card specific routines.
 ****************************************************************************/
 #include <gccore.h>
 #include <ogcsys.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/unistd.h>
 #include <ogc/lwp_watchdog.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -56,6 +57,8 @@ extern int iconindex[2*CARD_MAXICONS - 2];
 extern int lastframe;
 extern int lasticon;
 
+extern syssramex* __SYS_LockSramEx();
+extern u32 __SYS_UnlockSramEx(u32 write);
 extern Header cardheader;
 extern s32 memsize, sectsize;
 extern syssramex *sramex;
@@ -80,7 +83,6 @@ extern GCI gci;
 extern u8 FileBuffer[MAXFILEBUFFER] ATTRIBUTE_ALIGN (32);
 extern u8 CommentBuffer[64] ATTRIBUTE_ALIGN (32);
 
-extern u8 currFolder[260];
 extern int folderCount;
 extern int displaypath;
 
@@ -196,7 +198,7 @@ static void DrawCharacter (FT_Bitmap * bmp, FT_Int x, FT_Int y)
  *
  * Place the font bitmap on the screen
  */
-void DrawText (int x, int y, char *text)
+void DrawText (int x, int y, const char *text)
 {
 	int px, n;
 	int i;
@@ -745,7 +747,6 @@ void showCardInfo(int sel){
 	DrawBoxFilled(610, 145, 640, 390, getcolour(255,255,255));
 
 	int y = 190, x = 378;
-	int err;
 	char txt[1024];
 	int i;
 	char temp[5];
@@ -1056,10 +1057,9 @@ void showSaveInfo(int sel)
 // saveinfo 0: retrieves .raw, .gcp and .mci
 static void ShowFiles (int offset, int selection, int upordown, int saveinfo) {
 	int i, j;    //j helps us determine which entry to highlight
-	char text[23];
+	char text[33];
 	int ypos;
 	int w;
-	//int textlen = 22;
 	int textlen = 32;
 	
 	
