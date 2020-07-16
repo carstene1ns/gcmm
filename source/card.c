@@ -36,11 +36,11 @@ distribution.
 #include <gcutil.h>
 #include <ogc/machine/asm.h>
 #include <ogc/machine/processor.h>
-#include "system.h"
 #include <ogcsys.h>
 #include <ogc/cache.h>
 #include <ogc/lwp.h>
 #include <ogc/exi.h>
+#include <ogc/system.h>
 #include "card.h"
 
 //#define _CARD_DEBUG
@@ -68,24 +68,6 @@ struct card_header {
 	u8 padding[0x1d6];
 	u16 chksum1;
 	u16 chksum2;
-} ATTRIBUTE_PACKED;
-
-struct card_direntry {
-	u8 gamecode[4];
-	u8 company[2];
-	u8 pad_00;
-	u8 bannerfmt;
-	u8 filename[CARD_FILENAMELEN];
-	u32 lastmodified;
-	u32 iconaddr;
-	u16 iconfmt;
-	u16 iconspeed;
-	u8 permission;
-	u8 copytimes;
-	u16 block;
-	u16 length;
-	u16 pad_01;
-	u32 commentaddr;
 } ATTRIBUTE_PACKED;
 
 struct card_dat {			// dir allocation table
